@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  weather-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: weather-api
+    ports:
+      - "8000:8000"
+    environment:
+      # Weatherstack API Configuration
+      - WEATHERSTACK_API_KEY=${WEATHERSTACK_API_KEY}
+      - WEATHERSTACK_BASE_URL=${WEATHERSTACK_BASE_URL:-http://api.weatherstack.com}
+      
+      # Cache Configuration
+      - CACHE_TTL_SECONDS=${CACHE_TTL_SECONDS:-300}
+      - STALE_CACHE_MAX_AGE_SECONDS=${STALE_CACHE_MAX_AGE_SECONDS:-3600}
+      
+      # Rate Limiting Configuration
+      - RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE:-60}
+      
+      # Retry Configuration
+      - RETRY_MAX_ATTEMPTS=${RETRY_MAX_ATTEMPTS:-3}
+      - RETRY_BACKOFF_BASE=${RETRY_BACKOFF_BASE:-1.0}
+      
+      # Circuit Breaker Configuration
+      - CIRCUIT_BREAKER_FAILURE_THRESHOLD=${CIRCUIT_BREAKER_FAILURE_THRESHOLD:-5}
+      - CIRCUIT_BREAKER_RECOVERY_TIMEOUT=${CIRCUIT_BREAKER_RECOVERY_TIMEOUT:-60}
+      - CIRCUIT_BREAKER_FAILURE_RATE_THRESHOLD=${CIRCUIT_BREAKER_FAILURE_RATE_THRESHOLD:-0.5}
+      
+      # HTTP Timeout Configuration
+      - HTTP_CONNECT_TIMEOUT=${HTTP_CONNECT_TIMEOUT:-3.0}
+      - HTTP_READ_TIMEOUT=${HTTP_READ_TIMEOUT:-5.0}
+      - HTTP_TOTAL_TIMEOUT=${HTTP_TOTAL_TIMEOUT:-8.0}
+      
+      # Logging Configuration
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - weather-api-network
+
+networks:
+  weather-api-network:
+    driver: bridge
+
