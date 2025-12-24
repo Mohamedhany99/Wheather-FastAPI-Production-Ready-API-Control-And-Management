@@ -37,3 +37,10 @@ class WeatherstackAuthError(WeatherstackException):
     def __init__(self, message: str = "Invalid API key"):
         super().__init__(message, status_code=401)
 
+
+class CircuitBreakerOpenError(WeatherstackException):
+    """Exception for when circuit breaker is open."""
+
+    def __init__(self, message: str = "Service temporarily unavailable"):
+        super().__init__(message, status_code=503)
+

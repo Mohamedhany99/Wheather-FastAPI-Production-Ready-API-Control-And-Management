@@ -9,9 +9,9 @@ from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
-from app.api.routes import weather, health
+from app.api.routes import weather, health, metrics
 from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
-from app.exceptions import WeatherstackException
+from app.exceptions import WeatherstackException, CircuitBreakerOpenError
 
 
 # Configure logging
@@ -32,6 +32,12 @@ async def lifespan(app: FastAPI):
     logger.info(f"Log level: {settings.LOG_LEVEL}")
     logger.info(f"Rate limit: {settings.RATE_LIMIT_PER_MINUTE} requests/minute")
     logger.info(f"Cache TTL: {settings.CACHE_TTL_SECONDS} seconds")
+    logger.info(f"Stale cache max age: {settings.STALE_CACHE_MAX_AGE_SECONDS} seconds")
+    logger.info(f"Retry max attempts: {settings.RETRY_MAX_ATTEMPTS}")
+    logger.info(
+        f"Circuit breaker: {settings.CIRCUIT_BREAKER_FAILURE_THRESHOLD} failures, "
+        f"{settings.CIRCUIT_BREAKER_RECOVERY_TIMEOUT}s recovery timeout"
+    )
     yield
     # Shutdown
     logger.info("Shutting down Weather API application")
@@ -54,6 +60,7 @@ app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 # Include routers
 app.include_router(weather.router)
 app.include_router(health.router)
+app.include_router(metrics.router)
 
 
 # Exception handlers
@@ -63,6 +70,18 @@ async def weatherstack_exception_handler(
 ) -> JSONResponse:
     """Handle Weatherstack exceptions."""
     logger.error(f"Weatherstack exception: {exc.message}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message, "error_type": exc.__class__.__name__},
+    )
+
+
+@app.exception_handler(CircuitBreakerOpenError)
+async def circuit_breaker_exception_handler(
+    request: Request, exc: CircuitBreakerOpenError
+) -> JSONResponse:
+    """Handle circuit breaker open exceptions."""
+    logger.warning(f"Circuit breaker open: {exc.message}")
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.message, "error_type": exc.__class__.__name__},

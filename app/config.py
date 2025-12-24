@@ -12,9 +12,24 @@ class Settings(BaseSettings):
 
     # Cache configuration
     CACHE_TTL_SECONDS: int = 300  # 5 minutes default
+    STALE_CACHE_MAX_AGE_SECONDS: int = 3600  # 1 hour for stale cache fallback
 
     # Rate limiting configuration
     RATE_LIMIT_PER_MINUTE: int = 60
+
+    # Retry configuration
+    RETRY_MAX_ATTEMPTS: int = 3
+    RETRY_BACKOFF_BASE: float = 1.0  # seconds
+
+    # Circuit breaker configuration
+    CIRCUIT_BREAKER_FAILURE_THRESHOLD: int = 5  # consecutive failures
+    CIRCUIT_BREAKER_RECOVERY_TIMEOUT: int = 60  # seconds
+    CIRCUIT_BREAKER_FAILURE_RATE_THRESHOLD: float = 0.5  # 50%
+
+    # HTTP timeout configuration
+    HTTP_CONNECT_TIMEOUT: float = 3.0  # seconds
+    HTTP_READ_TIMEOUT: float = 5.0  # seconds
+    HTTP_TOTAL_TIMEOUT: float = 8.0  # seconds
 
     # Logging configuration
     LOG_LEVEL: str = "INFO"
