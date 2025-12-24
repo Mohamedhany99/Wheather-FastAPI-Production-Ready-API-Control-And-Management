@@ -88,9 +88,7 @@ async def get_weather(
     try:
         logger.info(f"Fetching weather data for city: {city}")
         metrics.record_request()
-        weather_data = await circuit_breaker.call(
-            weatherstack_service.get_current_weather, city
-        )
+        weather_data = await circuit_breaker.call(weatherstack_service.get_current_weather, city)
 
         # Store in cache
         cache.set(cache_key, weather_data)
@@ -167,4 +165,3 @@ async def get_weather(
             duration = time.time() - start_time
             metrics.record_response_time(duration)
             raise HTTPException(status_code=500, detail="Internal server error")
-

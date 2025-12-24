@@ -43,4 +43,3 @@ class CircuitBreakerOpenError(WeatherstackException):
 
     def __init__(self, message: str = "Service temporarily unavailable"):
         super().__init__(message, status_code=503)
-

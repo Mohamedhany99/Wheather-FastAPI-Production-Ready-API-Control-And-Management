@@ -21,4 +21,3 @@ async def get_metrics_endpoint():
     """
     metrics_instance = get_metrics_instance()
     return metrics_instance.get_stats()
-

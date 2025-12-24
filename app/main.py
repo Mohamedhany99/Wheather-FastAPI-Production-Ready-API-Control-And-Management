@@ -42,6 +42,7 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("Shutting down Weather API application")
     from app.services.weatherstack import weatherstack_service
+
     await weatherstack_service.close()
 
 
@@ -107,4 +108,3 @@ async def root():
         "docs": "/docs",
         "health": "/health",
     }
-

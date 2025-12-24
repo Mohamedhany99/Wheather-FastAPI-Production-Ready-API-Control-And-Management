@@ -177,4 +177,3 @@ class WeatherstackService:
 
 # Global service instance
 weatherstack_service = WeatherstackService()
-

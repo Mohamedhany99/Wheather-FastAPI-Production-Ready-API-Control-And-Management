@@ -50,4 +50,3 @@ class WeatherstackResponse(BaseModel):
         """Pydantic config."""
 
         extra = "allow"  # Allow extra fields from Weatherstack API
-

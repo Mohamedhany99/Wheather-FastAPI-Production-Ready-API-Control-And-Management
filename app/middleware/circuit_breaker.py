@@ -39,12 +39,8 @@ class CircuitBreaker:
         recovery_timeout: int = None,
         failure_rate_threshold: float = None,
     ):
-        self.failure_threshold = (
-            failure_threshold or settings.CIRCUIT_BREAKER_FAILURE_THRESHOLD
-        )
-        self.recovery_timeout = (
-            recovery_timeout or settings.CIRCUIT_BREAKER_RECOVERY_TIMEOUT
-        )
+        self.failure_threshold = failure_threshold or settings.CIRCUIT_BREAKER_FAILURE_THRESHOLD
+        self.recovery_timeout = recovery_timeout or settings.CIRCUIT_BREAKER_RECOVERY_TIMEOUT
         self.failure_rate_threshold = (
             failure_rate_threshold or settings.CIRCUIT_BREAKER_FAILURE_RATE_THRESHOLD
         )
@@ -126,6 +122,7 @@ class CircuitBreaker:
                 # Track circuit breaker opening in metrics
                 try:
                     from app.middleware.metrics import get_metrics
+
                     get_metrics().record_circuit_breaker_open()
                 except ImportError:
                     pass  # Metrics not available
@@ -162,9 +159,7 @@ class CircuitBreaker:
         if not self._should_attempt_request():
             from app.exceptions import CircuitBreakerOpenError
 
-            raise CircuitBreakerOpenError(
-                "Circuit breaker is OPEN. Service unavailable."
-            )
+            raise CircuitBreakerOpenError("Circuit breaker is OPEN. Service unavailable.")
 
         try:
             result = await func(*args, **kwargs)
@@ -193,4 +188,3 @@ circuit_breaker = CircuitBreaker()
 def get_circuit_breaker() -> CircuitBreaker:
     """Get the global circuit breaker instance."""
     return circuit_breaker
-

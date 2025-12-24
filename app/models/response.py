@@ -10,12 +10,8 @@ class ResponseMetadata(BaseModel):
     cached: bool = Field(description="Whether the data came from cache")
     stale: bool = Field(description="Whether the data is stale (expired cache)")
     age_seconds: float = Field(description="Age of the data in seconds")
-    source: str = Field(
-        description="Source of data: 'api', 'cache', 'cache_fallback'"
-    )
-    retry_attempts: int = Field(
-        default=0, description="Number of retry attempts made"
-    )
+    source: str = Field(description="Source of data: 'api', 'cache', 'cache_fallback'")
+    retry_attempts: int = Field(default=0, description="Number of retry attempts made")
     circuit_breaker_state: Optional[str] = Field(
         default=None, description="Circuit breaker state: 'closed', 'open', 'half_open'"
     )
@@ -31,4 +27,3 @@ class WeatherResponse(BaseModel):
         """Pydantic config."""
 
         extra = "allow"
-

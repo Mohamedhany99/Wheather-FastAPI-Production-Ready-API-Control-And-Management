@@ -26,4 +26,3 @@ async def health_check() -> Dict[str, Any]:
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "service": "weather-api",
     }
-

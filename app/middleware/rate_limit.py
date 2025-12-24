@@ -25,8 +25,5 @@ def get_rate_limiter() -> Limiter:
 
 def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> Response:
     """Custom handler for rate limit exceeded."""
-    logger.warning(
-        f"Rate limit exceeded for IP: {get_remote_address(request)}"
-    )
+    logger.warning(f"Rate limit exceeded for IP: {get_remote_address(request)}")
     return _rate_limit_exceeded_handler(request, exc)
-

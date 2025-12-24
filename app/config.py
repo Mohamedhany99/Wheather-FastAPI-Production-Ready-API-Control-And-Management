@@ -52,9 +52,13 @@ except Exception:
     print("\nMissing required environment variable: WEATHERSTACK_API_KEY", file=sys.stderr)
     print("\nTo fix this:", file=sys.stderr)
     print("1. Create a .env file with: WEATHERSTACK_API_KEY=your_api_key", file=sys.stderr)
-    print("2. Or set environment variable: export WEATHERSTACK_API_KEY=your_api_key", file=sys.stderr)
-    print("3. Or pass it to Docker: docker run -e WEATHERSTACK_API_KEY=your_api_key ...", file=sys.stderr)
+    print(
+        "2. Or set environment variable: export WEATHERSTACK_API_KEY=your_api_key", file=sys.stderr
+    )
+    print(
+        "3. Or pass it to Docker: docker run -e WEATHERSTACK_API_KEY=your_api_key ...",
+        file=sys.stderr,
+    )
     print("\nGet your free API key at: https://weatherstack.com/signup/free", file=sys.stderr)
     print("=" * 60, file=sys.stderr)
     sys.exit(1)
-

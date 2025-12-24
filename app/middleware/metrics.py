@@ -159,4 +159,3 @@ class MetricsMiddleware:
             error_type = type(e).__name__
             self.metrics.record_error(error_type)
             raise
-

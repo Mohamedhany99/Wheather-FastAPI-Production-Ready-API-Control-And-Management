@@ -34,9 +34,7 @@ class CacheManager:
         # Use regular dict to track entries with timestamps for stale cache support
         self._cache: Dict[str, CacheEntry] = {}
         self.ttl_seconds = ttl_seconds
-        self.stale_max_age_seconds = (
-            stale_max_age_seconds or settings.STALE_CACHE_MAX_AGE_SECONDS
-        )
+        self.stale_max_age_seconds = stale_max_age_seconds or settings.STALE_CACHE_MAX_AGE_SECONDS
         self.maxsize = 1000
 
     def _cleanup_expired(self):
@@ -52,9 +50,7 @@ class CacheManager:
         """Evict oldest entries if cache is full."""
         if len(self._cache) >= self.maxsize:
             # Remove oldest entry
-            oldest_key = min(
-                self._cache.keys(), key=lambda k: self._cache[k].timestamp
-            )
+            oldest_key = min(self._cache.keys(), key=lambda k: self._cache[k].timestamp)
             del self._cache[oldest_key]
 
     def get(self, key: str) -> Dict[str, Any] | None:
@@ -71,9 +67,7 @@ class CacheManager:
             logger.debug(f"Cache miss for key: {key}")
         return None
 
-    def get_with_metadata(
-        self, key: str
-    ) -> Tuple[Dict[str, Any] | None, Dict[str, Any]]:
+    def get_with_metadata(self, key: str) -> Tuple[Dict[str, Any] | None, Dict[str, Any]]:
         """
         Get cache entry with metadata about freshness.
 
@@ -162,4 +156,3 @@ class CacheManager:
 def get_cache_manager() -> CacheManager:
     """Get or create cache manager instance."""
     return CacheManager(ttl_seconds=settings.CACHE_TTL_SECONDS)
-
