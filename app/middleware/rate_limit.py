@@ -1,7 +1,6 @@
 """Rate limiting middleware using slowapi."""
 
 import logging
-from typing import Callable
 
 from fastapi import Request, Response
 from slowapi import Limiter, _rate_limit_exceeded_handler

@@ -5,7 +5,6 @@ import time
 from typing import Dict, Any
 
 from fastapi import APIRouter, Query, HTTPException, Depends, Request
-from slowapi import Limiter
 
 from app.services.weatherstack import weatherstack_service
 from app.dependencies import get_cache_manager, CacheManager
@@ -13,7 +12,6 @@ from app.middleware.rate_limit import get_rate_limiter
 from app.middleware.circuit_breaker import get_circuit_breaker, CircuitBreaker
 from app.middleware.metrics import get_metrics
 from app.exceptions import WeatherstackException, CircuitBreakerOpenError
-from app.models.response import ResponseMetadata
 
 logger = logging.getLogger(__name__)
 

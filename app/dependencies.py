@@ -5,7 +5,6 @@ import time
 from functools import lru_cache
 from typing import Dict, Any, Tuple
 
-from cachetools import TTLCache
 
 from app.config import settings
 
@@ -42,7 +41,6 @@ class CacheManager:
 
     def _cleanup_expired(self):
         """Remove entries that exceed stale max age."""
-        current_time = time.time()
         keys_to_remove = []
         for key, entry in self._cache.items():
             if entry.age_seconds() > self.stale_max_age_seconds:

@@ -4,7 +4,7 @@ import logging
 import time
 from enum import Enum
 from typing import Callable, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from app.config import settings
 
@@ -170,7 +170,7 @@ class CircuitBreaker:
             result = await func(*args, **kwargs)
             self._record_success()
             return result
-        except Exception as e:
+        except Exception:
             self._record_failure()
             raise
 

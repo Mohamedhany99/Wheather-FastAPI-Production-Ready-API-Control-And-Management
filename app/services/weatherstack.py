@@ -151,7 +151,7 @@ class WeatherstackService:
                 last_error = WeatherstackAPIError(f"Request error: {str(e)}")
                 logger.warning(f"Request error on attempt {attempt}: {e}")
 
-            except WeatherstackException as e:
+            except WeatherstackAPIError as e:
                 # Don't retry on non-retryable errors
                 if not self._is_retryable_error(e):
                     raise

@@ -1,6 +1,5 @@
 """Configuration management using Pydantic Settings."""
 
-import os
 import sys
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -46,11 +45,11 @@ class Settings(BaseSettings):
 # Global settings instance
 try:
     settings = Settings()
-except Exception as e:
+except Exception:
     print("=" * 60, file=sys.stderr)
     print("ERROR: Configuration validation failed!", file=sys.stderr)
     print("=" * 60, file=sys.stderr)
-    print(f"\nMissing required environment variable: WEATHERSTACK_API_KEY", file=sys.stderr)
+    print("\nMissing required environment variable: WEATHERSTACK_API_KEY", file=sys.stderr)
     print("\nTo fix this:", file=sys.stderr)
     print("1. Create a .env file with: WEATHERSTACK_API_KEY=your_api_key", file=sys.stderr)
     print("2. Or set environment variable: export WEATHERSTACK_API_KEY=your_api_key", file=sys.stderr)
