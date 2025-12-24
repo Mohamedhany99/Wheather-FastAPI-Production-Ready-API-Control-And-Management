@@ -70,6 +70,106 @@ poetry run uvicorn app.main:app --reload
 
 The API will be available at `http://localhost:8000`
 
+## Docker Setup
+
+### Using Docker Compose (Recommended)
+
+1. **Create `.env` file** (if not already created):
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your WEATHERSTACK_API_KEY
+   ```
+
+2. **Build and run with Docker Compose**:
+   ```bash
+   docker-compose up --build
+   ```
+
+   The API will be available at `http://localhost:8000`
+
+3. **Run in detached mode**:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **View logs**:
+   ```bash
+   docker-compose logs -f
+   ```
+
+5. **Stop the container**:
+   ```bash
+   docker-compose down
+   ```
+
+### Using Docker directly
+
+1. **Create `.env` file** (if not already created):
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your WEATHERSTACK_API_KEY
+   ```
+
+2. **Build the Docker image**:
+   ```bash
+   docker build -t weather-api .
+   ```
+
+3. **Run the container** (choose one method):
+
+   **Option A: Using .env file** (recommended):
+   ```bash
+   docker run -d \
+     --name weather-api \
+     -p 8000:8000 \
+     --env-file .env \
+     weather-api
+   ```
+
+   **Option B: Pass environment variable directly**:
+   ```bash
+   docker run -d \
+     --name weather-api \
+     -p 8000:8000 \
+     -e WEATHERSTACK_API_KEY=your_api_key_here \
+     weather-api
+   ```
+
+4. **View logs**:
+   ```bash
+   docker logs -f weather-api
+   ```
+
+5. **Stop and remove container**:
+   ```bash
+   docker stop weather-api
+   docker rm weather-api
+   ```
+
+**Important:** The `WEATHERSTACK_API_KEY` environment variable is **required**. Make sure to either:
+- Use `--env-file .env` to load from a file, or
+- Use `-e WEATHERSTACK_API_KEY=your_key` to pass it directly
+
+### Docker Features
+
+- **Multi-stage build** for optimized image size
+- **Non-root user** for security
+- **Health checks** built-in
+- **Environment variable support** via `.env` file
+- **Production-ready** configuration
+
+### Troubleshooting Docker
+
+**Error: "Field required [type=missing, input_value={}, input_type=dict]"**
+
+This means the `WEATHERSTACK_API_KEY` environment variable is missing. Solutions:
+
+1. **Make sure `.env` file exists** and contains `WEATHERSTACK_API_KEY=your_key`
+2. **When using `docker run`**, include `--env-file .env` or `-e WEATHERSTACK_API_KEY=your_key`
+3. **When using `docker-compose`**, make sure `.env` file is in the same directory
+
+The application will now show a helpful error message if the API key is missing.
+
 ## API Endpoints
 
 ### Get Weather
@@ -89,40 +189,50 @@ curl "http://localhost:8000/weather?city=London"
 **Example Response:**
 ```json
 {
-  "request": {
-    "type": "City",
-    "query": "London, United Kingdom",
-    "language": "en",
-    "unit": "m"
+  "data": {
+    "request": {
+      "type": "City",
+      "query": "London, United Kingdom",
+      "language": "en",
+      "unit": "m"
+    },
+    "location": {
+      "name": "London",
+      "country": "United Kingdom",
+      "region": "City of London, Greater London",
+      "lat": "51.517",
+      "lon": "-0.106",
+      "timezone_id": "Europe/London",
+      "localtime": "2024-01-15 14:30",
+      "localtime_epoch": 1705329000,
+      "utc_offset": "0.0"
+    },
+    "current": {
+      "observation_time": "02:30 PM",
+      "temperature": 8,
+      "weather_code": 116,
+      "weather_icons": ["https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"],
+      "weather_descriptions": ["Partly cloudy"],
+      "wind_speed": 13,
+      "wind_degree": 230,
+      "wind_dir": "SW",
+      "pressure": 1018,
+      "precip": 0.0,
+      "humidity": 75,
+      "cloudcover": 50,
+      "feelslike": 5,
+      "uv_index": 1,
+      "visibility": 10,
+      "is_day": "yes"
+    }
   },
-  "location": {
-    "name": "London",
-    "country": "United Kingdom",
-    "region": "City of London, Greater London",
-    "lat": "51.517",
-    "lon": "-0.106",
-    "timezone_id": "Europe/London",
-    "localtime": "2024-01-15 14:30",
-    "localtime_epoch": 1705329000,
-    "utc_offset": "0.0"
-  },
-  "current": {
-    "observation_time": "02:30 PM",
-    "temperature": 8,
-    "weather_code": 116,
-    "weather_icons": ["https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png"],
-    "weather_descriptions": ["Partly cloudy"],
-    "wind_speed": 13,
-    "wind_degree": 230,
-    "wind_dir": "SW",
-    "pressure": 1018,
-    "precip": 0.0,
-    "humidity": 75,
-    "cloudcover": 50,
-    "feelslike": 5,
-    "uv_index": 1,
-    "visibility": 10,
-    "is_day": "yes"
+  "metadata": {
+    "cached": false,
+    "stale": false,
+    "age_seconds": 0,
+    "source": "api",
+    "retry_attempts": 0,
+    "circuit_breaker_state": "closed"
   }
 }
 ```
@@ -144,6 +254,47 @@ curl "http://localhost:8000/health"
   "status": "healthy",
   "timestamp": "2024-01-15T14:30:00Z",
   "service": "weather-api"
+}
+```
+
+### Metrics
+
+**GET** `/metrics`
+
+Returns application metrics including request counts, error rates, cache performance, and response time percentiles.
+
+**Example Request:**
+```bash
+curl "http://localhost:8000/metrics"
+```
+
+**Example Response:**
+```json
+{
+  "counters": {
+    "api_requests_total": 150,
+    "api_errors_total": 5,
+    "api_timeouts_total": 2,
+    "cache_hits_total": 120,
+    "cache_misses_total": 30,
+    "stale_cache_fallbacks_total": 3,
+    "circuit_breaker_opens_total": 1,
+    "retry_attempts_total": 8
+  },
+  "errors_by_type": {
+    "WeatherstackAPIError": 3,
+    "timeout": 2
+  },
+  "rates": {
+    "cache_hit_rate": 0.8,
+    "error_rate": 0.033
+  },
+  "response_times": {
+    "p50": 0.245,
+    "p95": 0.892,
+    "p99": 1.234,
+    "count": 150
+  }
 }
 ```
 
@@ -223,7 +374,10 @@ poetry run ruff check .
 │       └── rate_limit.py      # Rate limiting middleware
 ├── .env                        # Environment variables (gitignored)
 ├── .env.example               # Example environment file
+├── .dockerignore              # Docker ignore file
 ├── .gitignore
+├── Dockerfile                  # Docker image definition
+├── docker-compose.yml         # Docker Compose configuration
 ├── pyproject.toml             # Poetry configuration
 ├── README.md                  # This file
 └── tests/                     # Test directory
